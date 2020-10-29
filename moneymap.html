@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Connect Widget Demo</title>
+  <style type="text/css">
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+  </style>
+  <!-- Source the connect.js file, this gives access to MoneyDesktopWidgetLoader constructor on window -->
+  <!-- <script type="text/javascript" src="https://widgets.moneydesktop.com/assets/mx-widgetloader.js"></script> -->
+  <script type="text/javascript" src="http://localhost:3000/assets/mx-widgetloader.js"></script>
+</head>
+
+<body>
+  <!-- Simple input to put your connect widget URL. -->
+  <input id="connecturl" type="text" placeholder="Widget URL" />
+  <button id="openConnect">Open Connect</button>
+  <button id="closeConnect">Close Connect</button>
+  <div id="md-widget"></div>
+
+  <script type="text/javascript">
+    var openButton = document.getElementById('openConnect')
+    var closeButton = document.getElementById('closeConnect')
+
+    // Create an instance of MXConnect.
+    // Used for setting up any configuration options and registering callbacks.
+    var mxConnect = new window.MoneyDesktopWidgetLoader({
+      iframeTitle: 'Connect',
+      autoload: false,
+      /**
+       * Any configuration options documented can be configured here:
+       * https://developer.mx.com/moneymap/mx/#advanced-desktop-widget-usage-configuration-options
+       *
+       * These values will override any configuration values that were set when
+       * the URL was requested.
+       */
+      // config: {},
+      targetOrigin: "*",
+    })
+
+
+    /**
+     * When we click the open button, get the URL in the input field and load.
+     *
+     * A 'real' integration would need to get a URL from MX.
+     * See the docs for details: https://developer.mx.com/sso/v3/#widget-urls
+     */
+    openButton.addEventListener('click', function() {
+      var connectURLInput = document.getElementById('connecturl')
+      var connectURL = connectURLInput.value
+
+      mxConnect.load(connectURL);
+
+      connectURLInput.value = ''
+    })
+
+    // Clear the widget on close click
+    closeButton.addEventListener('click', function() {
+      var connectIFrame = document.querySelector('iframe[title="Connect"]')
+
+      connectIFrame.remove()
+    })
+
+    /**
+     * Listen for post messages.
+     * Connect has an extensive list of [postmessages](https://developer.mx.com/moneymap/mx/#postmessage-events-version-4) you can use to know what
+     * is happening within it.
+     */
+    window.addEventListener('message', function (event) {
+      try {
+        // versions null -> 3 **Deprecated**
+        const data = JSON.parse(event.data);
+
+        if (data.moneyDesktop) {
+          console.log(data);
+        }
+      } catch (error) {
+        // version 4
+        if (event.data.mx) {
+          console.log(event.data);
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
