@@ -15,8 +15,8 @@
 <body>
   <!-- Simple input to put your connect widget URL. -->
   <input id="connecturl" type="text" placeholder="Widget URL" />
-  <button id="openConnect">Open Connect</button>
-  <button id="closeConnect">Close Connect</button>
+  <input id="openConnect" type="submit" value="Open Connect" />
+  <input id="closeConnect" type="button" value="Close Connect" />
   <div id="md-widget"></div>
 
   <script type="text/javascript">
@@ -49,17 +49,20 @@
     openButton.addEventListener('click', function() {
       var connectURLInput = document.getElementById('connecturl')
       var connectURL = connectURLInput.value
+      
+      if (connectURL) {
+        mxConnect.load(connectURL);
+        
+        connectURLInput.value = ''
+      } else {
+        alert("Enter in the widget URL")
+      }
 
-      mxConnect.load(connectURL);
-
-      connectURLInput.value = ''
     })
 
     // Clear the widget on close click
     closeButton.addEventListener('click', function() {
-      var connectIFrame = document.querySelector('iframe[title="Connect"]')
-
-      connectIFrame.remove()
+      document.getElementById('md-widget').innerHTML = ''
     })
 
     /**
